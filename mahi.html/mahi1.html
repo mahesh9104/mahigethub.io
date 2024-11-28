@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            width: 60%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .buttons button {
+            width: 48%;
+        }
+        .account-info {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .account-info ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .account-info li {
+            margin-bottom: 10px;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Bank Management System</h2>
+    <div id="accountForm">
+        <h3>Create New Account</h3>
+        <input type="text" id="accountHolder" placeholder="Enter Account Holder Name" />
+        <input type="number" id="initialDeposit" placeholder="Enter Initial Deposit Amount" />
+        <button onclick="createAccount()">Create Account</button>
+        <p id="createError" class="error"></p>
+    </div>
+
+    <div id="accountDetails" style="display: none;">
+        <div class="account-info">
+            <h3>Account Information</h3>
+            <ul>
+                <li><strong>Account Holder:</strong> <span id="accountHolderName"></span></li>
+                <li><strong>Account Number:</strong> <span id="accountNumber"></span></li>
+                <li><strong>Balance:</strong> $<span id="balance"></span></li>
+            </ul>
+        </div>
+
+        <div class="buttons">
+            <button onclick="deposit()">Deposit</button>
+            <button onclick="withdraw()">Withdraw</button>
+        </div>
+
+        <input type="number" id="transactionAmount" placeholder="Enter Amount" />
+        <p id="transactionError" class="error"></p>
+
+        <div class="transaction-history">
+            <h3>Transaction History</h3>
+            <ul id="transactionHistory"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    let account = null;
+
+    // Create a new account
+    function createAccount() {
+        const accountHolder = document.getElementById("accountHolder").value;
+        const initialDeposit = parseFloat(document.getElementById("initialDeposit").value);
+
+        if (!accountHolder || initialDeposit <= 0) {
+            document.getElementById("createError").textContent = "Please enter valid details.";
+            return;
+        }
+
+        // Create account with generated account number
+        account = {
+            accountHolder: accountHolder,
+            accountNumber: Math.floor(Math.random() * 1000000),
+            balance: initialDeposit,
+            transactionHistory: [`Initial Deposit: $${initialDeposit}`],
+        };
+
+        // Show account details
+        document.getElementById("accountHolderName").textContent = account.accountHolder;
+        document.getElementById("accountNumber").textContent = account.accountNumber;
+        document.getElementById("balance").textContent = account.balance.toFixed(2);
+        document.getElementById("accountForm").style.display = "none";
+        document.getElementById("accountDetails").style.display = "block";
+        document.getElementById("createError").textContent = "";
+    }
+
+    // Deposit money into account
+    function deposit() {
+        const amount = parseFloat(document.getElementById("transactionAmount").value);
+        if (amount <= 0) {
+            document.getElementById("transactionError").textContent = "Amount must be greater than 0.";
+            return;
+        }
+        account.balance += amount;
+        account.transactionHistory.push(`Deposited: $${amount}`);
+        updateAccountDetails();
+    }
+
+    // Withdraw money from account
+    function withdraw() {
+        const amount = parseFloat(document.getElementById("transactionAmount").value);
+        if (amount <= 0) {
+            document.getElementById("transactionError").textContent = "Amount must be greater than 0.";
+            return;
+        }
+        if (amount > account.balance) {
+            document.getElementById("transactionError").textContent = "Insufficient funds!";
+            return;
+        }
+        account.balance -= amount;
+        account.transactionHistory.push(`Withdrawn: $${amount}`);
+        updateAccountDetails();
+    }
+
+    // Update account details and transaction history
+    function updateAccountDetails() {
+        document.getElementById("balance").textContent = account.balance.toFixed(2);
+        document.getElementById("transactionAmount").value = "";
+
+        // Update transaction history
+        const historyList = document.getElementById("transactionHistory");
+        historyList.innerHTML = "";
+        account.transactionHistory.forEach(transaction => {
+            const listItem = document.createElement("li");
+            listItem.textContent = transaction;
+            historyList.appendChild(listItem);
+        });
+    }
+</script>
+
+</body>
+</html>
